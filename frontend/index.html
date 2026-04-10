@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SmartGuide - Form Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4v2"/><path d="M5 10h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/></svg>
+        </div>
+        <div class="title-container">
+          <h1>SmartGuide</h1>
+          <span class="status">● Online</span>
+        </div>
+      </div>
+      <button id="preview-btn" class="hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+        Preview
+      </button>
+    </header>
+
+    <!-- Main Chat Area -->
+    <main class="chat-area" id="chat-area">
+      <!-- Chat bubbles will be injected here -->
+      <div class="message system-msg glass" id="form-selection-panel">
+        <h3>Select a form to fill</h1>
+        <p>किस फॉर्म को भरना है, चुनें (Select the form to fill):</p>
+        <div class="form-list" id="form-list">
+          <div class="loading-spinner"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Input Area -->
+    <footer class="input-area hidden" id="input-area">
+      <form id="chat-form">
+        <div class="input-wrapper">
+          <input type="text" id="user-input" placeholder="Type your answer..." autocomplete="off">
+          <button type="submit" class="send-btn" id="send-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </form>
+    </footer>
+
+    <!-- Preview Modal -->
+    <div class="modal hidden" id="preview-modal">
+      <div class="modal-content glass">
+        <div class="modal-header">
+          <h2>Form Preview</h2>
+          <button class="close-btn" id="close-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="preview-content">
+          <!-- Form preview injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
