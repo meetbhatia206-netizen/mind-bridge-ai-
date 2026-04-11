@@ -2,6 +2,16 @@ const { v4: uuidv4 } = require('uuid');
 const forms = require('../data/forms');
 const store = require('../data/store');
 const { validateAnswer, processAnswer } = require('../utils/validators');
+const summaryGenerator = require('../utils/summaryGenerator');
+
+// Helper to evaluate dynamic fields safely before JSON response
+function prepareQuestion(question, answers) {
+  const q = { ...question };
+  if (typeof q.explanation_en === 'function') q.explanation_en = q.explanation_en(answers);
+  if (typeof q.explanation_hi === 'function') q.explanation_hi = q.explanation_hi(answers);
+  delete q.condition;
+  return q;
+}
 
 const getForms = (req, res) => {
   const formList = Object.values(forms).map(form => ({
@@ -36,14 +46,29 @@ const getNextQuestion = (req, res) => {
   const session = store.getSession(sessionId);
   if (!session) return res.status(404).json({ error: 'Session not found' });
 
+  const form = forms[session.formId];
+
+  // Advance if current question has a condition that fails
+  while (session.currentStepIndex < session.totalSteps) {
+    const nextQuestion = form.fields[session.currentStepIndex];
+    if (nextQuestion && nextQuestion.condition) {
+      try {
+        if (!nextQuestion.condition(session.answers)) {
+          session.currentStepIndex += 1;
+          continue;
+        }
+      } catch (e) { console.error('Condition err:', e) }
+    }
+    break;
+  }
+
   if (session.status === 'completed' || session.currentStepIndex >= session.totalSteps) {
     return res.json({ completed: true, message: 'All questions answered.' });
   }
 
-  const form = forms[session.formId];
   const nextQuestion = form.fields[session.currentStepIndex];
 
-  res.json({ completed: false, question: nextQuestion, currentStep: session.currentStepIndex + 1, totalSteps: session.totalSteps });
+  res.json({ completed: false, question: prepareQuestion(nextQuestion, session.answers), currentStep: session.currentStepIndex + 1, totalSteps: session.totalSteps });
 };
 
 const validateAnswerEndpoint = (req, res) => {
@@ -90,8 +115,21 @@ const saveAnswer = (req, res) => {
   const processedAnswer = processAnswer(currentField.validation, answer);
   session.answers[currentField.id] = processedAnswer;
   
-  // Increment step
+  // Increment step and check conditions for next steps
   session.currentStepIndex += 1;
+  while (session.currentStepIndex < session.totalSteps) {
+    const nextQ = form.fields[session.currentStepIndex];
+    if (nextQ && nextQ.condition) {
+      try {
+        if (!nextQ.condition(session.answers)) {
+          session.currentStepIndex += 1;
+          continue;
+        }
+      } catch (e) {}
+    }
+    break;
+  }
+
   const isCompleted = session.currentStepIndex >= session.totalSteps;
   
   if (isCompleted) {
@@ -104,7 +142,7 @@ const saveAnswer = (req, res) => {
     res.json({ completed: true, message: 'Form completed successfully', answers: session.answers });
   } else {
     const nextQuestion = form.fields[session.currentStepIndex];
-    res.json({ completed: false, nextQuestion, currentStep: session.currentStepIndex + 1, totalSteps: session.totalSteps });
+    res.json({ completed: false, nextQuestion: prepareQuestion(nextQuestion, session.answers), currentStep: session.currentStepIndex + 1, totalSteps: session.totalSteps });
   }
 };
 
@@ -140,6 +178,21 @@ const generateQr = (req, res) => {
   });
 };
 
+const getSmartSummary = (req, res) => {
+  const { sessionId, lang } = req.query;
+  if (!sessionId) return res.status(400).json({ error: 'Missing sessionId' });
+  
+  const session = store.getSession(sessionId);
+  if (!session) return res.status(404).json({ error: 'Session not found' });
+  
+  const form = forms[session.formId];
+  if (!form) return res.status(404).json({ error: 'Form layout not found' });
+  
+  const htmlSummary = summaryGenerator.generateSummary(session.formId, session.answers, lang || 'en');
+  
+  res.send({ html: htmlSummary });
+};
+
 module.exports = {
   getForms,
   startSession,
@@ -147,5 +200,6 @@ module.exports = {
   validateAnswerEndpoint,
   saveAnswer,
   getPreview,
-  generateQr
+  generateQr,
+  getSmartSummary
 };

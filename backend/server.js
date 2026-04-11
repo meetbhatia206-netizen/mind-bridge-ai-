@@ -22,6 +22,7 @@ app.post('/api/validate', formController.validateAnswerEndpoint);
 app.post('/api/save-answer', formController.saveAnswer);
 app.get('/api/preview', formController.getPreview);
 app.get('/api/generate-qr', formController.generateQr);
+app.get('/api/smart-summary', formController.getSmartSummary);
 
 // Simple health check
 app.get('/health', (req, res) => {
