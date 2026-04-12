@@ -1,38 +1,46 @@
-/* Constants & Globals */
+/* ════════════════════════════════════════════════════════════════
+   app.js  —  SmartGuide Frontend
+   Changes:
+     • Text-to-Speech (TTS) speaker button on every question bubble
+     • Client-side input validation (name / numeric / date / aadhaar / mobile)
+     • Auto-uppercase removed for general text; kept for name_required fields
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Constants & Globals ─────────────────────────────────────── */
 const API_BASE = 'http://localhost:3000/api';
 
 const UI_TEXT = {
   en: {
-    welcome: "Welcome!",
-    dashboardTitle: "How can I help you today?",
-    historyTitle: "Chat History",
-    previewBtn: "Generate Smart Guide",
-    previewModalTitle: "Smart Summary Guide",
-    typePlaceholder: "Type your answer...",
-    loading: "Loading...",
-    error: "An error occurred.",
-    skipped: "(Skipped)",
-    formCompleted: "Form completed successfully! 🎉<br><br>Tap the <b>Preview</b> button to view your responses.",
-    questionPrefix: "Question",
-    networkError: "Network Error. Please try again.",
-    backToDashboard: "Go Back",
-    noHistory: "No past conversations"
+    welcome: 'Welcome!',
+    dashboardTitle: 'How can I help you today?',
+    historyTitle: 'Chat History',
+    previewBtn: 'Generate Smart Guide',
+    previewModalTitle: 'Smart Summary Guide',
+    typePlaceholder: 'Type your answer...',
+    loading: 'Loading...',
+    error: 'An error occurred.',
+    skipped: '(Skipped)',
+    formCompleted: 'Form completed successfully! 🎉<br><br>Tap the <b>Preview</b> button to view your responses.',
+    questionPrefix: 'Question',
+    networkError: 'Network Error. Please try again.',
+    backToDashboard: 'Go Back',
+    noHistory: 'No past conversations'
   },
   hi: {
-    welcome: "स्वागत है!",
-    dashboardTitle: "मैं आपकी कैसे सहायता कर सकता हूँ?",
-    historyTitle: "चैट इतिहास",
-    previewBtn: "स्मार्ट गाइड बनाएं",
-    previewModalTitle: "स्मार्ट सारांश गाइड",
-    typePlaceholder: "अपना जवाब टाइप करें...",
-    loading: "लोड हो रहा है...",
-    error: "एक त्रुटि आई।",
-    skipped: "(छोड़ दिया)",
-    formCompleted: "फॉर्म सफलतापूर्वक पूरा हुआ! 🎉<br><br>अपने जवाब देखने के लिए <b>फॉर्म प्रीव्यू</b> बटन दबाएं।",
-    questionPrefix: "प्रश्न",
-    networkError: "नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।",
-    backToDashboard: "वापस जाएं",
-    noHistory: "कोई पिछला संवाद नहीं"
+    welcome: 'स्वागत है!',
+    dashboardTitle: 'मैं आपकी कैसे सहायता कर सकता हूँ?',
+    historyTitle: 'चैट इतिहास',
+    previewBtn: 'स्मार्ट गाइड बनाएं',
+    previewModalTitle: 'स्मार्ट सारांश गाइड',
+    typePlaceholder: 'अपना जवाब टाइप करें...',
+    loading: 'लोड हो रहा है...',
+    error: 'एक त्रुटि आई।',
+    skipped: '(छोड़ दिया)',
+    formCompleted: 'फॉर्म सफलतापूर्वक पूरा हुआ! 🎉<br><br>अपने जवाब देखने के लिए <b>फॉर्म प्रीव्यू</b> बटन दबाएं।',
+    questionPrefix: 'प्रश्न',
+    networkError: 'नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।',
+    backToDashboard: 'वापस जाएं',
+    noHistory: 'कोई पिछला संवाद नहीं'
   }
 };
 
@@ -43,100 +51,271 @@ const ICONS = [
   '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>'
 ];
 
-// State
-let selectedLang = null;
+// ── State ──────────────────────────────────────────────────────
+let selectedLang   = null;
 let currentSessionId = null;
-let currentQuestion = null;
-let questionCount = 1;
-let formsData = [];
+let currentQuestion  = null;
+let questionCount    = 1;
+let formsData        = [];
 
-// Elements
+// ── Element Cache ──────────────────────────────────────────────
 const els = {
-  screenLang: document.getElementById('screen-language'),
+  screenLang:      document.getElementById('screen-language'),
   screenDashboard: document.getElementById('screen-dashboard'),
-  screenChat: document.getElementById('screen-chat'),
-  
-  langBtns: document.querySelectorAll('.btn-lang'),
-  btnChangeLang: document.getElementById('btn-change-lang'),
-  
-  welcomeMsg: document.getElementById('welcome-msg'),
+  screenChat:      document.getElementById('screen-chat'),
+
+  langBtns:       document.querySelectorAll('.btn-lang'),
+  btnChangeLang:  document.getElementById('btn-change-lang'),
+
+  welcomeMsg:     document.getElementById('welcome-msg'),
   dashboardTitle: document.getElementById('dashboard-title'),
-  formGrid: document.getElementById('form-grid'),
-  
-  historyTitle: document.getElementById('history-title'),
+  formGrid:       document.getElementById('form-grid'),
+
+  historyTitle:    document.getElementById('history-title'),
   chatHistoryList: document.getElementById('chat-history-list'),
-  sidebarName: document.getElementById('sidebar-name'),
-  
-  backBtn: document.getElementById('back-btn'),
-  chatFormTitle: document.getElementById('chat-form-title'),
-  previewBtn: document.getElementById('preview-btn'),
+  sidebarName:     document.getElementById('sidebar-name'),
+
+  backBtn:        document.getElementById('back-btn'),
+  chatFormTitle:  document.getElementById('chat-form-title'),
+  previewBtn:     document.getElementById('preview-btn'),
   previewBtnText: document.getElementById('preview-btn-text'),
-  
-  chatArea: document.getElementById('chat-area'),
-  chatForm: document.getElementById('chat-form'),
+
+  chatArea:  document.getElementById('chat-area'),
+  chatForm:  document.getElementById('chat-form'),
   userInput: document.getElementById('user-input'),
-  sendBtn: document.getElementById('send-btn'),
-  
-  previewModal: document.getElementById('preview-modal'),
-  closeModal: document.getElementById('close-modal'),
+  sendBtn:   document.getElementById('send-btn'),
+
+  previewModal:  document.getElementById('preview-modal'),
+  closeModal:    document.getElementById('close-modal'),
   previewContent: document.getElementById('preview-content'),
-  modalTitle: document.getElementById('modal-title')
+  modalTitle:    document.getElementById('modal-title'),
+
+  formImageBtn:         document.getElementById('form-image-btn'),
+  formImageModal:       document.getElementById('form-image-modal'),
+  closeFormImageModal:  document.getElementById('close-form-image-modal')
 };
 
-/* Initialization */
+/* ════════════════════════════════════════════════════════════════
+   TEXT-TO-SPEECH (TTS)
+   Uses the Web Speech API (SpeechSynthesis) — no external libs.
+   ════════════════════════════════════════════════════════════════ */
+
+/**
+ * Speak text aloud using the browser SpeechSynthesis API.
+ * @param {string} text  - The text to speak
+ * @param {string} lang  - 'en' or 'hi'
+ */
+function speakText(text, lang) {
+  if (!('speechSynthesis' in window)) {
+    console.warn('SpeechSynthesis is not supported in this browser.');
+    return;
+  }
+  // Cancel any ongoing speech before starting new
+  window.speechSynthesis.cancel();
+
+  // Strip HTML tags so only plain text is spoken
+  const plainText = text.replace(/<[^>]*>/g, '');
+
+  const utterance = new SpeechSynthesisUtterance(plainText);
+  utterance.lang  = lang === 'hi' ? 'hi-IN' : 'en-IN';
+  utterance.rate  = 0.92;   // slightly slower for clarity
+  utterance.pitch = 1;
+
+  window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * Build the SVG speaker icon used on TTS buttons.
+ */
+function speakerIconSVG() {
+  return `<svg class="tts-icon" width="16" height="16" viewBox="0 0 24 24"
+    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+  </svg>`;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CLIENT-SIDE VALIDATION
+   Mirrors the backend validators.js rules for instant feedback.
+   ════════════════════════════════════════════════════════════════ */
+
+/**
+ * Validate user input against field validation type.
+ * @param {string} validationType - From currentQuestion.validation
+ * @param {string} value          - Raw input string
+ * @returns {{ isValid: boolean, message: string }}
+ */
+function validateClientSide(validationType, value) {
+  const v = (value || '').trim();
+
+  // Optional fields always pass if empty
+  if (!v) {
+    if (validationType === 'optional' || validationType === 'aadhaar_optional') {
+      return { isValid: true, message: '' };
+    }
+    return { isValid: false, message: selectedLang === 'hi'
+      ? 'यह फ़ील्ड खाली नहीं छोड़ सकते।'
+      : 'This field cannot be empty.' };
+  }
+
+  switch (validationType) {
+    /* 12-digit Aadhaar */
+    case 'aadhaar':
+    case 'aadhaar_optional':
+      if (!/^\d{12}$/.test(v)) {
+        return { isValid: false, message: selectedLang === 'hi'
+          ? 'आधार नंबर ठीक 12 अंकों का होना चाहिए।'
+          : 'Aadhaar must be exactly 12 digits.' };
+      }
+      break;
+
+    /* 10-digit mobile */
+    case 'mobile':
+      if (!/^\d{10}$/.test(v)) {
+        return { isValid: false, message: selectedLang === 'hi'
+          ? 'मोबाइल नंबर ठीक 10 अंकों का होना चाहिए।'
+          : 'Mobile number must be exactly 10 digits.' };
+      }
+      break;
+
+    /* Name — only letters and spaces */
+    case 'name_required':
+      if (!/^[A-Za-z\s]+$/.test(v)) {
+        return { isValid: false, message: selectedLang === 'hi'
+          ? 'नाम में केवल अक्षर और स्पेस होने चाहिए।'
+          : 'Name must contain only alphabets and spaces.' };
+      }
+      break;
+
+    /* 6-digit PIN */
+    case 'pincode':
+      if (!/^\d{6}$/.test(v)) {
+        return { isValid: false, message: selectedLang === 'hi'
+          ? 'पिन कोड ठीक 6 अंकों का होना चाहिए।'
+          : 'PIN Code must be exactly 6 digits.' };
+      }
+      break;
+
+    /* Generic required */
+    case 'required':
+      if (v.length === 0) {
+        return { isValid: false, message: selectedLang === 'hi'
+          ? 'यह फ़ील्ड आवश्यक है।'
+          : 'This field is required.' };
+      }
+      break;
+
+    default:
+      break;
+  }
+
+  // Additional type-based check: number fields must be numeric
+  if (currentQuestion && currentQuestion.type === 'number' && v && !/^\d+$/.test(v)) {
+    return { isValid: false, message: selectedLang === 'hi'
+      ? 'केवल संख्याएं दर्ज करें।'
+      : 'Please enter numbers only.' };
+  }
+
+  return { isValid: true, message: '' };
+}
+
+/**
+ * Show / hide an inline validation error beneath the input.
+ */
+function showInputError(message) {
+  let errEl = document.getElementById('input-error-msg');
+  if (!errEl) {
+    errEl = document.createElement('span');
+    errEl.id = 'input-error-msg';
+    errEl.className = 'input-error-msg';
+    els.userInput.parentNode.insertAdjacentElement('afterend', errEl);
+  }
+  errEl.textContent = message;
+  errEl.style.display = message ? 'block' : 'none';
+}
+
+function clearInputError() {
+  const errEl = document.getElementById('input-error-msg');
+  if (errEl) errEl.style.display = 'none';
+}
+
+/* ════════════════════════════════════════════════════════════════
+   INITIALIZATION
+   ════════════════════════════════════════════════════════════════ */
 function init() {
-  // Bind Language Buttons
+  // Language buttons
   els.langBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      setLanguage(btn.getAttribute('data-lang'));
-    });
+    btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang')));
   });
 
-  els.btnChangeLang.addEventListener('click', () => {
-    showScreen(els.screenLang);
-  });
+  els.btnChangeLang.addEventListener('click', () => showScreen(els.screenLang));
 
-  // Bind Chat
+  // Chat form submit
   els.chatForm.addEventListener('submit', handleChatSubmit);
-  
-  // Auto uppercase input
-  els.userInput.addEventListener('input', (e) => {
-    e.target.value = e.target.value.toUpperCase();
+
+  // Clear validation error while typing
+  els.userInput.addEventListener('input', () => {
+    clearInputError();
+
+    // Auto-uppercase ONLY for name_required fields
+    if (currentQuestion && currentQuestion.validation === 'name_required') {
+      els.userInput.value = els.userInput.value.toUpperCase();
+    }
   });
 
-  // Bind Navigation
+  // Navigation
   els.backBtn.addEventListener('click', () => {
+    window.speechSynthesis && window.speechSynthesis.cancel();
     showScreen(els.screenDashboard);
   });
-  
-  // Bind Preview
+
+  // Preview modal (Smart Guide)
   els.previewBtn.addEventListener('click', showPreview);
   els.closeModal.addEventListener('click', () => {
     els.previewModal.classList.add('hidden');
   });
+
+  // Form Image Preview modal
+  els.formImageBtn.addEventListener('click', () => {
+    els.formImageModal.classList.remove('hidden');
+  });
+  els.closeFormImageModal.addEventListener('click', () => {
+    els.formImageModal.classList.add('hidden');
+  });
+  // Close image modal on overlay click
+  els.formImageModal.addEventListener('click', (e) => {
+    if (e.target === els.formImageModal) els.formImageModal.classList.add('hidden');
+  });
+  // Close smart guide modal on overlay click
+  els.previewModal.addEventListener('click', (e) => {
+    if (e.target === els.previewModal) els.previewModal.classList.add('hidden');
+  });
 }
 
+/* ── Language & UI ───────────────────────────────────────────── */
 function setLanguage(lang) {
   selectedLang = lang;
   updateUIText();
   showScreen(els.screenDashboard);
-  if (formsData.length === 0) {
-    fetchForms();
-  } else {
-    renderFormGrid(formsData);
-  }
+  if (formsData.length === 0) fetchForms();
+  else renderFormGrid(formsData);
 }
 
 function updateUIText() {
   const t = UI_TEXT[selectedLang];
-  els.welcomeMsg.textContent = t.welcome;
-  els.dashboardTitle.textContent = t.dashboardTitle;
-  els.historyTitle.textContent = t.historyTitle;
-  els.previewBtnText.textContent = t.previewBtn;
-  els.modalTitle.textContent = t.previewModalTitle;
-  els.userInput.placeholder = t.typePlaceholder;
-  
-  if (els.chatHistoryList.children.length === 1 && els.chatHistoryList.children[0].classList.contains('empty-history')) {
+  els.welcomeMsg.textContent      = t.welcome;
+  els.dashboardTitle.textContent  = t.dashboardTitle;
+  els.historyTitle.textContent    = t.historyTitle;
+  els.previewBtnText.textContent  = t.previewBtn;
+  els.modalTitle.textContent      = t.previewModalTitle;
+  els.userInput.placeholder       = t.typePlaceholder;
+
+  if (
+    els.chatHistoryList.children.length === 1 &&
+    els.chatHistoryList.children[0].classList.contains('empty-history')
+  ) {
     els.chatHistoryList.children[0].textContent = t.noHistory;
   }
 }
@@ -146,15 +325,17 @@ function showScreen(screenEl) {
   screenEl.classList.remove('hidden');
 }
 
-/* Dashboard Functionality */
+/* ════════════════════════════════════════════════════════════════
+   DASHBOARD
+   ════════════════════════════════════════════════════════════════ */
 async function fetchForms() {
   els.formGrid.innerHTML = '<div class="loading-spinner"></div>';
   try {
-    const res = await fetch(`${API_BASE}/forms`);
+    const res  = await fetch(`${API_BASE}/forms`);
     const data = await res.json();
-    formsData = data.forms || [];
+    formsData  = data.forms || [];
     renderFormGrid(formsData);
-  } catch (error) {
+  } catch {
     els.formGrid.innerHTML = `<p style="color:var(--error); grid-column: 1/-1;">Error connecting to server. Is backend running?</p>`;
   }
 }
@@ -162,13 +343,11 @@ async function fetchForms() {
 function renderFormGrid(forms) {
   els.formGrid.innerHTML = '';
   forms.forEach((form, index) => {
-    const card = document.createElement('div');
+    const card    = document.createElement('div');
     card.className = 'form-card';
-    card.onclick = () => startSession(form.id, form.name);
-    
-    // Choose an icon repeatedly based on index
+    card.onclick   = () => startSession(form.id, form.name);
+
     const icon = ICONS[index % ICONS.length];
-    
     card.innerHTML = `
       <div class="form-card-icon">${icon}</div>
       <h3>${form.name}</h3>
@@ -176,39 +355,61 @@ function renderFormGrid(forms) {
     `;
     els.formGrid.appendChild(card);
   });
+
+  // ── Coming Soon placeholder cards ──────────────────────────
+  const comingSoonTitles = [
+    { en: 'PAN Card', hi: 'पैन कार्ड' },
+    { en: 'Passport Application', hi: 'पासपोर्ट आवेदन' },
+    { en: 'Voter ID', hi: 'वोटर आईडी' },
+  ];
+  comingSoonTitles.forEach(() => {
+    const card = document.createElement('div');
+    card.className = 'form-card coming-soon';
+    card.innerHTML = `
+      <div class="form-card-icon">?</div>
+      <h3>${selectedLang === 'en' ? 'Coming Soon' : 'जल्द आ रहा है'}</h3>
+      <p>${selectedLang === 'en' ? 'Service not yet available' : 'सेवा अभी उपलब्ध नहीं है'}</p>
+      <span class="coming-soon-badge">${selectedLang === 'en' ? 'Coming Soon' : 'जल्द आ रहा है'}</span>
+    `;
+    els.formGrid.appendChild(card);
+  });
 }
 
-/* Chat Session */
+/* ════════════════════════════════════════════════════════════════
+   CHAT SESSION
+   ════════════════════════════════════════════════════════════════ */
 async function startSession(formId, formName) {
   els.chatFormTitle.textContent = formName;
-  els.chatArea.innerHTML = '';
+  els.chatArea.innerHTML        = '';
   els.previewBtn.classList.add('hidden');
+  els.formImageBtn.classList.add('hidden');
   els.userInput.value = '';
+  clearInputError();
   disableInput(true);
-  
-  // Add history item mock
+
   addHistoryItem(formName);
-  
+
   questionCount = 1;
   showScreen(els.screenChat);
-  
+
   addBotMessage(`Selected <b>${formName}</b>`, false, false);
   showTyping();
 
   try {
-    const res = await fetch(`${API_BASE}/start-session`, {
+    const res  = await fetch(`${API_BASE}/start-session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ formId })
     });
     const data = await res.json();
-    
+
     hideTyping();
-    if(data.error) throw new Error(data.error);
-    
+    if (data.error) throw new Error(data.error);
+
     currentSessionId = data.sessionId;
     els.previewBtn.classList.remove('hidden');
-    
+    els.formImageBtn.classList.remove('hidden');
+
     handleNextQuestion(data.firstQuestion);
   } catch (error) {
     hideTyping();
@@ -219,127 +420,190 @@ async function startSession(formId, formName) {
 function addHistoryItem(formName) {
   const empty = els.chatHistoryList.querySelector('.empty-history');
   if (empty) empty.remove();
-  
-  const li = document.createElement('li');
+
+  const li   = document.createElement('li');
   li.className = 'history-item';
-  const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   li.innerHTML = `<strong>${formName}</strong><br><span style="font-size:0.8em;opacity:0.7">${time}</span>`;
   els.chatHistoryList.prepend(li);
 }
 
+/* ── Render next question with TTS button ────────────────────── */
 function handleNextQuestion(questionObj) {
   currentQuestion = questionObj;
-  
+  clearInputError();
+
   const explanation = selectedLang === 'en' ? questionObj.explanation_en : questionObj.explanation_hi;
   if (explanation) {
     addBotMessage(`<i>${explanation}</i>`, false, false);
   }
 
   const label = selectedLang === 'en' ? questionObj.label_en : questionObj.label_hi;
-  addBotMessage(label, false, true);
+  // Pass label text for TTS injection
+  addBotMessage(label, false, true, label);
 
-  // Configure input
-  if(questionObj.type === 'number') els.userInput.type = 'number';
-  else if(questionObj.type === 'date') els.userInput.type = 'date';
+  // Configure input type
+  if (questionObj.type === 'number') els.userInput.type = 'number';
+  else if (questionObj.type === 'date') els.userInput.type = 'date';
   else els.userInput.type = 'text';
 
   disableInput(false);
   els.userInput.focus();
 }
 
+/* ── Handle answer submission ────────────────────────────────── */
 async function handleChatSubmit(e) {
   e.preventDefault();
   const answer = els.userInput.value.trim();
-  
-  if(!answer && currentQuestion.validation !== 'optional' && currentQuestion.validation !== 'aadhaar_optional') return;
+
+  // ── Client-side validation ─────────────────────────────────
+  if (currentQuestion) {
+    const result = validateClientSide(currentQuestion.validation, answer);
+    if (!result.isValid) {
+      showInputError(result.message);
+      return;
+    }
+  }
+
+  // Skip check (empty allowed for optional)
+  const isOptional = currentQuestion &&
+    (currentQuestion.validation === 'optional' || currentQuestion.validation === 'aadhaar_optional');
+  if (!answer && !isOptional) return;
 
   disableInput(true);
-  
-  const isNo = answer.toLowerCase() === 'no' || answer === 'नहीं';
+  clearInputError();
+
+  const isNo   = answer.toLowerCase() === 'no' || answer === 'नहीं';
   const isSkip = !answer;
 
-  const displayAnswer = answer || UI_TEXT[selectedLang].skipped;
-  addMessage(displayAnswer, true);
+  addMessage(answer || UI_TEXT[selectedLang].skipped, true);
   els.userInput.value = '';
-  
-  // Personalized response
+
+  // Friendly acknowledgement
   if (isNo || isSkip) {
-    const skipMsg = selectedLang === 'en' ? "No problem, we will skip this." : "कोई बात नहीं, हम इसे छोड़ देंगे।";
+    const skipMsg = selectedLang === 'en'
+      ? 'No problem, we will skip this.'
+      : 'कोई बात नहीं, हम इसे छोड़ देंगे।';
     addBotMessage(skipMsg, false, false);
   } else {
-    const msgsEn = ["Got it 👍", "Understood.", "Noted, thanks!", "Perfect!"];
-    const msgsHi = ["समझ गया 👍", "ठीक है।", "धन्यवाद!", "उत्तम!"];
-    const arr = selectedLang === 'en' ? msgsEn : msgsHi;
-    const randMsg = arr[Math.floor(Math.random() * arr.length)];
-    addBotMessage(randMsg, false, false);
+    const msgsEn = ['Got it 👍', 'Understood.', 'Noted, thanks!', 'Perfect!'];
+    const msgsHi = ['समझ गया 👍', 'ठीक है।', 'धन्यवाद!', 'उत्तम!'];
+    const arr    = selectedLang === 'en' ? msgsEn : msgsHi;
+    addBotMessage(arr[Math.floor(Math.random() * arr.length)], false, false);
   }
 
   showTyping();
-  
+
   try {
-    const res = await fetch(`${API_BASE}/save-answer`, {
+    const res  = await fetch(`${API_BASE}/save-answer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId: currentSessionId, answer })
     });
     const data = await res.json();
-    
+
     hideTyping();
-    if(data.error) {
+
+    if (data.error) {
       addBotMessage(data.error, true, false);
       disableInput(false);
       return;
     }
-    
-    if(data.completed) {
+
+    if (data.completed) {
       addBotMessage(UI_TEXT[selectedLang].formCompleted, false, false);
-      disableInput(true); // completely done
+      disableInput(true);
     } else {
       questionCount++;
       handleNextQuestion(data.nextQuestion);
     }
-  } catch (error) {
+  } catch {
     hideTyping();
     addBotMessage(UI_TEXT[selectedLang].networkError, true, false);
     disableInput(false);
   }
 }
 
-/* Chat UI Helpers */
+/* ════════════════════════════════════════════════════════════════
+   CHAT UI HELPERS
+   ════════════════════════════════════════════════════════════════ */
 function disableInput(disabled) {
   els.userInput.disabled = disabled;
-  els.sendBtn.disabled = disabled;
+  els.sendBtn.disabled   = disabled;
 }
 
-function addBotMessage(text, isError = false, isQuestion = false) {
+/**
+ * Append a bot message bubble to the chat area.
+ *
+ * The TTS button is built with DOM APIs (NOT innerHTML onclick) to avoid
+ * HTML-attribute quoting conflicts when label text contains quotes or
+ * special characters (e.g. Hindi script, apostrophes).
+ *
+ * @param {string}  text       - HTML content of the message
+ * @param {boolean} isError    - Highlight as error if true
+ * @param {boolean} isQuestion - Shows question number badge + TTS button
+ * @param {string}  [ttsText]  - Plain label text read aloud (for questions)
+ */
+function addBotMessage(text, isError = false, isQuestion = false, ttsText = '') {
   const row = document.createElement('div');
   row.className = 'msg-row bot';
-  
+
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
   if (isError) bubble.style.borderLeft = '4px solid var(--error)';
-  
-  let content = '';
+
+  // ── Question header: badge + TTS speaker button ─────────────
   if (isQuestion) {
     const prefix = UI_TEXT[selectedLang].questionPrefix;
-    content += `<span class="question-number">${prefix} ${questionCount}</span>`;
+
+    // Wrapper row
+    const header = document.createElement('div');
+    header.className = 'question-header';
+
+    // Question-number badge
+    const badge = document.createElement('span');
+    badge.className = 'question-number';
+    badge.textContent = `${prefix} ${questionCount}`;
+
+    // TTS button — built via DOM so text is stored as a JS value,
+    // never serialised inside an HTML attribute string.
+    const ttsBtn = document.createElement('button');
+    ttsBtn.className = 'tts-btn';
+    ttsBtn.title = 'Read aloud';
+    ttsBtn.setAttribute('aria-label', 'Read question aloud');
+    ttsBtn.innerHTML = speakerIconSVG();
+
+    // Capture the plain label text in closure — safe for any characters
+    const speakLabel = (ttsText || text).replace(/<[^>]*>/g, '');
+    const speakLang  = selectedLang;           // snapshot at creation time
+    ttsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      speakText(speakLabel, speakLang);
+    });
+
+    header.appendChild(badge);
+    header.appendChild(ttsBtn);
+    bubble.appendChild(header);
   }
-  content += text;
-  
-  bubble.innerHTML = content;
+
+  // ── Message body ─────────────────────────────────────────────
+  const body = document.createElement('div');
+  body.innerHTML = text;
+  bubble.appendChild(body);
+
   row.appendChild(bubble);
   els.chatArea.appendChild(row);
   scrollToBottom();
 }
 
 function addMessage(text, isUser) {
-  const row = document.createElement('div');
+  const row    = document.createElement('div');
   row.className = `msg-row ${isUser ? 'user' : 'bot'}`;
-  
+
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
   bubble.textContent = text;
-  
+
   row.appendChild(bubble);
   els.chatArea.appendChild(row);
   scrollToBottom();
@@ -349,6 +613,7 @@ function scrollToBottom() {
   els.chatArea.scrollTop = els.chatArea.scrollHeight;
 }
 
+/* Typing indicator node (reused) */
 const typingNode = document.createElement('div');
 typingNode.className = 'msg-row bot typing-wrapper';
 typingNode.innerHTML = `<div class="bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
@@ -358,29 +623,27 @@ function showTyping() {
   scrollToBottom();
 }
 function hideTyping() {
-  if(typingNode.parentNode) typingNode.parentNode.removeChild(typingNode);
+  if (typingNode.parentNode) typingNode.parentNode.removeChild(typingNode);
 }
 
-/* Preview Flow */
+/* ════════════════════════════════════════════════════════════════
+   PREVIEW / SMART SUMMARY
+   ════════════════════════════════════════════════════════════════ */
 async function showPreview() {
   els.previewModal.classList.remove('hidden');
   els.previewContent.innerHTML = '<div class="loading-spinner"></div>';
-  
+
   try {
-    const res = await fetch(`${API_BASE}/smart-summary?sessionId=${currentSessionId}&lang=${selectedLang}`);
+    const res  = await fetch(`${API_BASE}/smart-summary?sessionId=${currentSessionId}&lang=${selectedLang}`);
     const data = await res.json();
-    
-    if(data.error) throw new Error(data.error);
-    
-    if (data.html) {
-      els.previewContent.innerHTML = data.html;
-    } else {
-      els.previewContent.innerHTML = `<p style="color:var(--error)">No guide generated.</p>`;
-    }
-  } catch (error) {
+
+    if (data.error) throw new Error(data.error);
+
+    els.previewContent.innerHTML = data.html
+      || `<p style="color:var(--error)">No guide generated.</p>`;
+  } catch {
     els.previewContent.innerHTML = `<p style="color:var(--error)">Failed to load smart guide.</p>`;
   }
 }
-
-// Start
+/* ── Start ───────────────────────────────────────────────────── */
 init();
