@@ -58,6 +58,58 @@ let currentQuestion  = null;
 let questionCount    = 1;
 let formsData        = [];
 
+// ── Domain Terms Dictionary ──────────────────────────────────────────────
+const TERMS_DICTIONARY = [
+  {
+    regex: /Pre.?Enrolment ID|पूर्व.नामांकन आईडी/gi,
+    term: "Pre-Enrolment ID",
+    explain_en: "Pre-Enrolment ID is a 14-digit number you get when you start Aadhaar update online. If you haven't done that, you can leave it blank.",
+    explain_hi: "प्री-एनरोलमेंट आईडी (Pre-Enrolment ID) एक 14 अंकों का नंबर है जो आपको ऑनलाइन आधार अपडेट शुरू करने पर मिलता है। यदि आपने ऐसा नहीं किया है, तो आप इसे खाली छोड़ सकते हैं।"
+  },
+  {
+    regex: /\bC\/O \(Care of\)|\bC\/O\b/gi,
+    term: "C/O (Care of)",
+    explain_en: "C/O (Care of) means the name of a person (like father, husband, or guardian) associated with your address.",
+    explain_hi: "C/O (Care of) का मतलब है आपके पते से जुड़े किसी व्यक्ति (जैसे पिता, पति, या अभिभावक) का नाम।"
+  },
+  {
+    regex: /\bHOF\b|परिवार के मुखिया|HOF का रिश्ता/gi,
+    term: "HOF",
+    explain_en: "HOF (Head of Family) means a family member whose Aadhaar can be used to update your address or details.",
+    explain_hi: "HOF (Head of Family) का मतलब परिवार का वह मुखिया होता है जिसके आधार का उपयोग आपके पते या विवरण को अपडेट करने के लिए किया जा सकता है।"
+  },
+  {
+    regex: /Introducer.based|परिचयकर्ता/gi,
+    term: "Introducer-based",
+    explain_en: "Introducer-based means someone authorized by UIDAI will verify your identity, used when you don't have standard documents.",
+    explain_hi: "Introducer-based (परिचयकर्ता आधारित) का मतलब है कि UIDAI द्वारा अधिकृत कोई व्यक्ति आपकी पहचान सत्यापित करेगा, इसका उपयोग तब किया जाता है जब आपके पास मानक दस्तावेज़ न हों।"
+  },
+  {
+    regex: /Document.based|दस्तावेज़ आधारित/gi,
+    term: "Document-based",
+    explain_en: "Document-based means you will provide standard documents like PAN, Voter ID, etc., to prove your identity or address.",
+    explain_hi: "Document-based (दस्तावेज़ आधारित) का मतलब है कि आप अपनी पहचान या पता साबित करने के लिए पैन, वोटर आईडी आदि जैसे मानक दस्तावेज़ प्रदान करेंगे।"
+  },
+  {
+    regex: /\bPOI\b|Proof of Identity|पहचान का प्रमाण/gi,
+    term: "POI (Proof of Identity)",
+    explain_en: "Proof of Identity (POI) means a document that confirms who you are (like Aadhaar, PAN, etc.)",
+    explain_hi: "पहचान प्रमाण (POI) का मतलब वह दस्तावेज होता है जो आपकी पहचान साबित करता है जैसे आधार कार्ड, पैन कार्ड आदि।"
+  },
+  {
+    regex: /\bPOA\b|Proof of Address|पते का प्रमाण/gi,
+    term: "POA (Proof of Address)",
+    explain_en: "Proof of Address (POA) means a document that shows where you live (like Electricity Bill, Voter ID, etc.)",
+    explain_hi: "पता प्रमाण (POA) का मतलब वह दस्तावेज होता है जो यह दिखाता है कि आप कहाँ रहते हैं (जैसे बिजली बिल, वोटर आईडी आदि)।"
+  },
+  {
+    regex: /\bPOR\b|Proof of Relationship|रिश्ते का प्रमाण/gi,
+    term: "POR (Proof of Relationship)",
+    explain_en: "Proof of Relationship (POR) means a document showing how you are related to the Head of Family (like Ration Card, Birth Certificate).",
+    explain_hi: "रिश्ते का प्रमाण (POR) का मतलब है वह दस्तावेज़ जो दिखाता है कि परिवार के मुखिया के साथ आपका क्या रिश्ता है (जैसे राशन कार्ड, जन्म प्रमाण पत्र)।"
+  }
+];
+
 // ── Element Cache ──────────────────────────────────────────────
 const els = {
   screenLang:      document.getElementById('screen-language'),
@@ -433,14 +485,25 @@ function handleNextQuestion(questionObj) {
   currentQuestion = questionObj;
   clearInputError();
 
-  const explanation = selectedLang === 'en' ? questionObj.explanation_en : questionObj.explanation_hi;
-  if (explanation) {
-    addBotMessage(`<i>${explanation}</i>`, false, false);
+  let label = selectedLang === 'en' ? questionObj.label_en : questionObj.label_hi;
+  const originalLabelText = label; // Keep clean text for TTS
+  
+  // 1. Highlight terminology in the question label
+  TERMS_DICTIONARY.forEach(termObj => {
+    label = label.replace(termObj.regex, (match) => {
+      return `<span class="term-highlight">${match}</span>`;
+    });
+  });
+
+  // 2. Display field-specific explanation
+  // We resolve it if it's a function (done on backend usually, but just in case)
+  let explanationText = selectedLang === 'en' ? questionObj.explanation_en : questionObj.explanation_hi;
+  if (explanationText) {
+    addBotMessage(`<i>${explanationText}</i>`, false, false);
   }
 
-  const label = selectedLang === 'en' ? questionObj.label_en : questionObj.label_hi;
-  // Pass label text for TTS injection
-  addBotMessage(label, false, true, label);
+  // Pass label text for TTS injection (TTS should read plain text)
+  addBotMessage(label, false, true, originalLabelText);
 
   // Configure input type
   if (questionObj.type === 'number') els.userInput.type = 'number';

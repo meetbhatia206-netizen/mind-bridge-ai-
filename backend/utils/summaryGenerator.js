@@ -51,11 +51,11 @@ function generateAadhaarHtmlGuide(answers, lang) {
     <ul style="list-style-type: none; padding-left: 0;">
       <li style="margin-bottom: 6px;">Tick ${tick} <b>${residentType}</b></li>
       <li style="margin-bottom: 6px;">Tick ${tick} <b>${appType}</b></li>
-      ${answers.pre_enrolment_id
-        ? `<li style="margin-bottom: 6px;">Write Pre-Enrolment ID: <b>${answers.pre_enrolment_id}</b></li>`
+      ${answers.pre_enrolment_id_has && (answers.pre_enrolment_id_has.toLowerCase() === 'yes' || answers.pre_enrolment_id_has === 'हाँ')
+        ? `<li style="margin-bottom: 6px;">Write Pre-Enrolment ID manually on the form (if you have one).</li>`
         : `<li style="margin-bottom: 6px; color: var(--text-muted);">Leave Pre-Enrolment ID blank.</li>`}
-      ${isUpdate && answers.uid_eid_number
-        ? `<li style="margin-bottom: 6px;">Write ${answers.id_type_update || 'Aadhaar Number'}: <b>${answers.uid_eid_number}</b></li>`
+      ${isUpdate
+        ? `<li style="margin-bottom: 6px;">Write your Aadhaar number clearly in the designated box.</li>`
         : ''}
     </ul>
 
@@ -71,8 +71,8 @@ function generateAadhaarHtmlGuide(answers, lang) {
       </li>
       <li style="margin-bottom: 6px;">
         ${isHi
-          ? '<span style="color:var(--text-muted);">नोट: पूरा नाम, लिंग और जन्मतिथि भौतिक फॉर्म में सीधे भरें।</span>'
-          : '<span style="color:var(--text-muted);">Note: Fill Full Name, Gender & Date of Birth directly on the physical form.</span>'}
+          ? '<span style="color:var(--text-muted);">नोट: अपना पूरा नाम दस्तावेजों के अनुसार, लिंग और जन्मतिथि भौतिक फॉर्म में सीधे भरें।</span>'
+          : '<span style="color:var(--text-muted);">Note: Write your full name as per your documents, Gender & Date of Birth directly on the physical form.</span>'}
       </li>
     </ul>
 
@@ -93,13 +93,12 @@ function generateAadhaarHtmlGuide(answers, lang) {
     <ul style="list-style-type: none; padding-left: 0;">
       <li style="margin-bottom: 6px; color: var(--text-muted);">
         ${isHi
-          ? 'नोट: पता विवरण (मकान नंबर, क्षेत्र, शहर, जिला, राज्य, पिन कोड) भौतिक फॉर्म में सीधे भरें।'
-          : 'Note: Fill address details (House No., Area, City, District, State, PIN Code) directly on the physical form.'}
+          ? 'नोट: अपना पता (मकान नंबर, क्षेत्र, शहर, जिला, राज्य, पिन कोड) सावधानीपूर्वक भौतिक फॉर्म में सीधे भरें।'
+          : 'Note: Fill your address carefully (House No., Area, City, District, State, PIN Code) directly on the physical form.'}
       </li>
       ${under18
         ? `<li style="margin-bottom: 6px; margin-top:10px; color:#f59e0b;">
-             <b>Minor Alert:</b> Since you are under 18, write ${answers.relative_details_type || 'Guardian'} details.
-             Relative Aadhaar: <b>${answers.relative_aadhaar || '—'}</b>
+             <b>Minor Alert:</b> Since you are under 18, write ${answers.relative_details_type || 'Guardian'} details and their Aadhaar number manually.
            </li>`
         : `<li style="margin-bottom: 6px; margin-top:10px; color: var(--text-muted);">Since you are 18+, skip Guardian details.</li>`}
     </ul>
@@ -122,14 +121,14 @@ function generateAadhaarHtmlGuide(answers, lang) {
         ? `
           <li style="margin-bottom: 6px;">Tick ${tick} <b>Introducer Based</b></li>
           <li style="margin-bottom: 6px; color: var(--text-muted);"><b>Instruction:</b> Skip Document and HOF sections. Complete Introducer details.</li>
-          <li style="margin-bottom: 6px;">Write Introducer's Aadhaar: <b>${answers.introducer_aadhaar || '______________'}</b></li>
+          <li style="margin-bottom: 6px;">Write Introducer's Aadhaar manually on the form.</li>
         `
         : isHof
         ? `
           <li style="margin-bottom: 6px;">Tick ${tick} <b>Head of Family (HOF) Based</b></li>
           <li style="margin-bottom: 6px; color: var(--text-muted);"><b>Instruction:</b> Skip Document and Introducer sections. Complete HOF details.</li>
           <li style="margin-bottom: 6px;">Tick Relationship: <b>${answers.hof_type || '______________'}</b></li>
-          <li style="margin-bottom: 6px;">Write HOF's Aadhaar: <b>${answers.hof_aadhaar || '______________'}</b></li>
+          <li style="margin-bottom: 6px;">Write HOF's Aadhaar manually on the form.</li>
         `
         : `<li style="margin-bottom: 6px;">Tick your preferred Verification type.</li>`}
     </ul>
