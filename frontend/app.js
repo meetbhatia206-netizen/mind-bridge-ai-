@@ -43,7 +43,7 @@ async function openChat(formId) {
   appendMessage('bot', 'Connecting to your AI Wellness Mentor...', true);
 
   try {
-    const res = await fetch(`${API_BASE}/forms/start`, {
+    const res = await fetch(`${API_BASE}/start-session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ formId: formId, lang: 'en' })
@@ -71,7 +71,7 @@ async function fetchNextQuestion() {
   if (!currentSessionId) return;
 
   try {
-    const res = await fetch(`${API_BASE}/forms/next?sessionId=${currentSessionId}`);
+    const res = await fetch(`${API_BASE}/next-question?sessionId=${currentSessionId}`);
     const data = await res.json();
 
     if (data.status === 'completed') {
@@ -119,7 +119,7 @@ async function submitAnswer() {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/forms/answer`, {
+    const res = await fetch(`${API_BASE}/save-answer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -154,7 +154,7 @@ async function submitAnswer() {
 // Generate the final Gemini guide
 async function generateWellnessGuide() {
   try {
-    const res = await fetch(`${API_BASE}/summary?sessionId=${currentSessionId}&lang=en`);
+    const res = await fetch(`${API_BASE}/smart-summary?sessionId=${currentSessionId}&lang=en`);
     const data = await res.json();
     
     summaryBody.innerHTML = data.html;
