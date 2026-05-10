@@ -1,154 +1,284 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Saral Setu – Form Assistant</title>
-  <meta name="description" content="Saral Setu – Your multilingual government form assistant. Fill forms easily in English or Hindi.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Serenity – Mental Wellness Assistant</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  
   <link rel="stylesheet" href="style.css">
+  
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      min-height: max(884px, 100dvh);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline": "#727780",
+            "secondary-fixed": "#c9ebca",
+            "inverse-on-surface": "#eff1f3",
+            "on-surface-variant": "#42474f",
+            "primary-fixed": "#d2e4ff",
+            "on-primary": "#ffffff",
+            "secondary": "#47654c",
+            "surface-dim": "#d8dadc",
+            "on-error-container": "#93000a",
+            "surface-container-highest": "#e0e3e5",
+            "on-surface": "#191c1e",
+            "on-secondary": "#ffffff",
+            "on-secondary-fixed-variant": "#304d35",
+            "tertiary-container": "#9893b5",
+            "background": "#f7f9fb",
+            "on-primary-fixed-variant": "#0b497b",
+            "outline-variant": "#c2c7d0",
+            "surface-container-high": "#e6e8ea",
+            "tertiary": "#5e5b7a",
+            "surface-container-lowest": "#ffffff",
+            "error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#c8c2e6",
+            "surface-container": "#eceef0",
+            "secondary-container": "#c9ebca",
+            "primary": "#2e6194",
+            "inverse-surface": "#2d3133",
+            "on-primary-fixed": "#001d36",
+            "on-primary-container": "#003157",
+            "surface-bright": "#f7f9fb",
+            "primary-fixed-dim": "#9fcaff",
+            "inverse-primary": "#9fcaff",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed": "#1b1833",
+            "on-secondary-container": "#4d6b51",
+            "on-tertiary-container": "#2f2c48",
+            "surface": "#f7f9fb",
+            "secondary-fixed-dim": "#aecfaf",
+            "tertiary-fixed": "#e4dfff",
+            "surface-variant": "#e0e3e5",
+            "primary-container": "#6b9ad1",
+            "on-error": "#ffffff",
+            "error": "#ba1a1a",
+            "on-background": "#191c1e",
+            "on-tertiary-fixed-variant": "#474361",
+            "surface-tint": "#2e6194",
+            "surface-container-low": "#f2f4f6",
+            "on-secondary-fixed": "#04210d"
+          },
+          "fontFamily": {
+            "body-lg": ["Quicksand"],
+            "body-md": ["Quicksand"],
+            "headline-lg": ["Quicksand"],
+            "headline-md": ["Quicksand"]
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-  <div class="app-container">
-
-    <!-- SCREEN 1: Language Selection -->
-    <div id="screen-language" class="screen full-center">
-      <div class="glass-panel lang-panel animated-entry">
-        <div class="lang-logo">
-          <span class="logo-mark">सस</span>
-          <span class="logo-text">Saral Setu</span>
-        </div>
-        <div class="lang-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M2 12H22"/><path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z"/></svg>
-        </div>
-        <h1 class="lang-title">Select your language<span class="divider"></span>अपनी भाषा चुनें</h1>
-        <div class="lang-buttons">
-          <button class="btn-lang" data-lang="en">English</button>
-          <button class="btn-lang" data-lang="hi">हिंदी</button>
-        </div>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+  
+  <!-- TopAppBar -->
+  <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center w-full px-5 py-3">
+    <div class="flex items-center gap-4">
+      <button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors duration-300 rounded-full p-2 active:scale-95 transition-transform duration-200">arrow_back</button>
+    </div>
+    <h1 class="font-headline-md text-2xl font-bold text-primary">Serenity</h1>
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
+        <img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLQDLbmgABh6SW8IuFFK5CeQtwo9_9OLCNjSw2SJkVeYGcoKwouqap8qAM8fZ-9NjkItnPwiybl-Fjenu7-8G75Lz1iVdnsuaQ6iXO9O21hRFa4BUIrKIyDlov102pVvP4IHJDRm0OEySAFKrMN_Zq5U_83Hpj7lklA3tmWs8492OJXmH1aECjcGWMequXXrlfKvf1yvj3RiRU2u9JyvVWT9sVBBKEmPx-fAf0kvtbQpnPBHdP-mgfBLS1pYOQFXZoe3OhFCyIre0"/>
       </div>
     </div>
+  </header>
 
-    <!-- SCREEN 2: Dashboard -->
-    <div id="screen-dashboard" class="screen hidden">
-      <header class="dashboard-header">
-        <div class="header-brand">
-          <span class="brand-mark">सस</span>
-          <span class="brand-name">Saral Setu</span>
-        </div>
-        <div class="user-profile">
-          <div class="avatar">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  <main class="max-w-screen-xl mx-auto px-5 pt-10">
+    <!-- Hero Section -->
+    <section class="mb-16 text-center">
+      <h2 class="text-5xl font-bold mb-4 text-on-surface">You're not alone</h2>
+      <p class="text-lg text-on-surface-variant max-w-2xl mx-auto">
+        Whatever you're going through, we're here to listen. Take a deep breath. Support is just a moment away.
+      </p>
+    </section>
+
+    <!-- Crisis Button Section -->
+    <section class="mb-10">
+      <button class="w-full bg-secondary-container hover:bg-secondary-fixed transition-all duration-300 shadow-[0_10px_30px_-5px_rgba(71,101,76,0.15)] rounded-full py-6 px-10 flex items-center justify-between group active:scale-[0.98]">
+        <div class="flex items-center gap-6">
+          <div class="bg-white/50 p-4 rounded-full">
+            <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">emergency</span>
           </div>
-          <div class="user-greeting">
-            <span class="status-online">● Online</span>
-            <span id="welcome-msg" class="welcome-text">Welcome!</span>
+          <div class="text-left">
+            <h3 class="text-2xl font-semibold text-on-secondary-container">Crisis Hotline</h3>
+            <p class="text-base text-on-secondary-fixed-variant">Immediate 24/7 support for urgent needs</p>
           </div>
         </div>
-        <button id="btn-change-lang" class="icon-btn" title="Change Language">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M2 12H22"/><path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z"/></svg>
+        <span class="material-symbols-outlined text-secondary text-3xl group-hover:translate-x-1 transition-transform">call</span>
+      </button>
+    </section>
+
+    <!-- Support Options Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+      
+      <!-- General Chatbot Trigger -->
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 group cursor-pointer" onclick="openChat('emotional_wellness')">
+        <div class="bg-primary-container/10 p-4 rounded-lg">
+          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+        </div>
+        <div>
+          <h4 class="text-xl font-semibold text-on-surface mb-2">Talk to AI Counselor</h4>
+          <p class="text-base text-on-surface-variant mb-6">Start a private, secure conversation with our AI wellness mentor right now.</p>
+        </div>
+        <button class="mt-auto w-full bg-primary text-on-primary font-semibold py-3 rounded-full shadow-lg shadow-primary/20 hover:bg-primary-container transition-colors active:scale-95 duration-150">
+          Start Messaging
         </button>
-      </header>
-      <div class="dashboard-content">
-        <h2 id="dashboard-title" class="dashboard-title">How can I help you today?</h2>
-        <p class="dashboard-subtitle" id="dashboard-subtitle">Select a form below to get started</p>
-        <div id="form-grid" class="form-grid">
-           <!-- Cards go here -->
-           <div class="loading-spinner"></div>
+      </div>
+
+      <!-- Student Burnout Flow -->
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer" onclick="openChat('student_burnout')">
+        <div class="bg-tertiary-container/10 p-4 rounded-lg">
+          <span class="material-symbols-outlined text-tertiary text-3xl" style="font-variation-settings: 'FILL' 1;">school</span>
+        </div>
+        <div>
+          <h4 class="text-xl font-semibold text-on-surface mb-2">Student Burnout</h4>
+          <p class="text-base text-on-surface-variant mb-6">Feeling overwhelmed with exams or mental fatigue? Let's work through it.</p>
+        </div>
+        <button class="mt-auto w-full bg-surface-container-high text-on-surface-variant font-semibold py-3 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150">
+          Get Support
+        </button>
+      </div>
+
+      <!-- Anxiety Support Flow -->
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer" onclick="openChat('anxiety_support')">
+        <div class="bg-[#ffdad6]/40 p-4 rounded-lg">
+          <span class="material-symbols-outlined text-[#ba1a1a] text-3xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+        </div>
+        <div>
+          <h4 class="text-xl font-semibold text-on-surface mb-2">Anxiety Support</h4>
+          <p class="text-base text-on-surface-variant mb-6">Experiencing overthinking, restlessness, or panic? We can help you calm down.</p>
+        </div>
+        <button class="mt-auto w-full bg-surface-container-high text-on-surface-variant font-semibold py-3 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150">
+          Get Support
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Content Section: What to Expect -->
+    <section class="mb-16 max-w-3xl mx-auto">
+      <div class="text-center mb-10">
+        <h3 class="text-3xl font-semibold text-on-surface mb-2">What to expect when you chat</h3>
+        <div class="w-16 h-1 bg-secondary-container mx-auto rounded-full"></div>
+      </div>
+      <div class="space-y-6">
+        <div class="flex gap-6 items-start">
+          <div class="flex-shrink-0 w-12 h-12 bg-background flex items-center justify-center rounded-full text-secondary font-bold text-xl shadow-sm border border-secondary/10">1</div>
+          <div>
+            <h5 class="text-xl font-semibold text-on-surface mb-1">A friendly AI voice</h5>
+            <p class="text-base text-on-surface-variant">Our AI assistant will guide you and simply listen. You don't have to have all the answers.</p>
+          </div>
+        </div>
+        <div class="flex gap-6 items-start">
+          <div class="flex-shrink-0 w-12 h-12 bg-background flex items-center justify-center rounded-full text-secondary font-bold text-xl shadow-sm border border-secondary/10">2</div>
+          <div>
+            <h5 class="text-xl font-semibold text-on-surface mb-1">A safe, private space</h5>
+            <p class="text-base text-on-surface-variant">Everything you share is processed securely on your local device. This is your time to express yourself without judgment.</p>
+          </div>
+        </div>
+        <div class="flex gap-6 items-start">
+          <div class="flex-shrink-0 w-12 h-12 bg-background flex items-center justify-center rounded-full text-secondary font-bold text-xl shadow-sm border border-secondary/10">3</div>
+          <div>
+            <h5 class="text-xl font-semibold text-on-surface mb-1">Practical next steps</h5>
+            <p class="text-base text-on-surface-variant">At the end of the session, the AI generates a highly personalized Smart Wellness Guide for you.</p>
+          </div>
         </div>
       </div>
+    </section>
+
+    <!-- Visual Anchor / Calm Illustration -->
+    <section class="mb-16">
+      <div class="relative w-full h-[300px] rounded-3xl overflow-hidden shadow-2xl shadow-primary/5">
+        <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCO27YHyVZtdqm43S81PTxoWv0t_fWXEgKZ00vRzDcIk3fP5E0AQeVzGenlVjSV3A0rtIT5yO26KjxZL-yhg9mhcDCCMq2Ny-6i9ScMJ-hcMawvqSHIyD5aMbzomRwCxvIJuwTklp9pt-10LHvGa7X4FHmzLjR55I0eJ6x3mBo5h397i628XlykidG_LV7-sO8_XWbtSr6o8edZ_wVh7EtlMMf6Cl3HrOeExjnH_e3zppljijYj4aj8qbOVQ65LTM7V4rap1c9PoY"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent flex flex-col justify-end p-8">
+          <p class="text-2xl font-semibold text-on-surface text-center italic opacity-80">"The bravest thing you ever did was continuing your life when you wanted to give up."</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- BottomNavBar -->
+  <nav class="fixed bottom-0 left-0 w-full z-40 flex justify-around items-center px-4 py-3 bg-surface/95 backdrop-blur-lg shadow-[0_-4px_20px_0_rgba(46,97,148,0.05)] rounded-t-xl">
+    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-all active:scale-90 duration-150" href="#">
+      <span class="material-symbols-outlined">home_max</span>
+      <span class="text-sm font-semibold mt-1">Home</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-all active:scale-90 duration-150" href="#">
+      <span class="material-symbols-outlined">auto_stories</span>
+      <span class="text-sm font-semibold mt-1">Library</span>
+    </a>
+    <a class="flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-full px-4 py-1 transition-all active:scale-90 duration-150" href="javascript:void(0)" onclick="openChat('emotional_wellness')">
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+      <span class="text-sm font-semibold mt-1">Support</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-all active:scale-90 duration-150" href="#">
+      <span class="material-symbols-outlined">person</span>
+      <span class="text-sm font-semibold mt-1">Me</span>
+    </a>
+  </nav>
+
+  <!-- FLOATING CHATBOT WIDGET -->
+  <div id="chat-widget" class="fixed bottom-24 right-5 w-[90%] max-w-[400px] h-[600px] max-h-[70vh] bg-surface/90 backdrop-blur-2xl border border-surface-container-high rounded-3xl shadow-[0_30px_60px_-15px_rgba(46,97,148,0.3)] z-50 flex flex-col transition-all duration-400 opacity-0 translate-y-10 pointer-events-none overflow-hidden">
+    
+    <!-- Chat Header -->
+    <div class="bg-primary text-on-primary px-5 py-4 flex justify-between items-center rounded-t-3xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+          <span class="material-symbols-outlined">psychology_alt</span>
+        </div>
+        <div>
+          <h4 class="font-semibold text-lg leading-tight">AI Wellness Mentor</h4>
+          <p class="text-xs text-primary-fixed opacity-90">Online • Secure & Private</p>
+        </div>
+      </div>
+      <button class="material-symbols-outlined hover:bg-white/10 rounded-full p-2 transition-colors" onclick="closeChat()">close</button>
     </div>
 
-    <!-- SCREEN 3: Chatbot Interface -->
-    <div id="screen-chat" class="screen layout-chat hidden">
-      <!-- Left Sidebar -->
-      <aside class="chat-sidebar glass-panel">
-        <div class="sidebar-user-info">
-          <div class="avatar">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <div class="user-details">
-            <h3 id="sidebar-name">Guest User</h3>
-            <span class="status-online">● Online</span>
-          </div>
-        </div>
-        <div class="sidebar-chat-history">
-          <h4 id="history-title">Chat History</h4>
-          <ul id="chat-history-list" class="history-list">
-            <!-- Populated dynamically via JS -->
-            <li class="history-item empty-history">No past conversations</li>
-          </ul>
-        </div>
-      </aside>
-
-      <!-- Main Chat Area -->
-      <main class="chat-main">
-        <header class="chat-header glass-panel">
-          <div class="chat-header-info">
-            <button id="back-btn" class="icon-btn">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            </button>
-            <h2 id="chat-form-title">Form Name</h2>
-          </div>
-          <div class="chat-header-actions">
-            <button id="form-image-btn" class="btn-primary hidden">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span>Preview</span>
-            </button>
-            <button id="preview-btn" class="btn-primary hidden">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-              <span id="preview-btn-text">Generate Smart Guide</span>
-            </button>
-          </div>
-        </header>
-
-        <div id="chat-area" class="chat-area">
-          <!-- Chat bubbles injected here -->
-        </div>
-
-        <footer class="chat-footer glass-panel">
-          <form id="chat-form">
-            <div class="input-wrapper">
-              <input type="text" id="user-input" autocomplete="off" placeholder="Type your answer...">
-              <button type="submit" id="send-btn" class="btn-send">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-              </button>
-            </div>
-          </form>
-        </footer>
-      </main>
+    <!-- Chat Area -->
+    <div id="chat-area" class="flex-1 overflow-y-auto p-5 flex flex-col gap-4 bg-transparent relative">
+      <!-- Welcome Message injected by JS -->
     </div>
 
+    <!-- Chat Input -->
+    <div class="p-4 border-t border-surface-container-high bg-surface-container-lowest/50 backdrop-blur-md rounded-b-3xl">
+      <div class="relative flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-surface-container-high focus-within:border-primary transition-colors">
+        <input type="text" id="chat-input" class="w-full bg-transparent border-none outline-none text-on-surface placeholder:text-outline py-2" placeholder="Type your response..." autocomplete="off">
+        <button id="btn-send" class="ml-2 bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+          <span class="material-symbols-outlined text-xl">send</span>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Preview Modal -->
-  <div id="preview-modal" class="modal hidden">
-    <div class="modal-content glass-panel" style="max-width: 800px;">
-      <div class="modal-header">
-        <h2 id="modal-title">Smart Summary Guide</h2>
-        <button id="close-modal" class="icon-btn">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
+  <!-- SUMMARY MODAL (Wellness Guide) -->
+  <div id="modal-summary" class="fixed inset-0 bg-inverse-surface/80 backdrop-blur-sm z-[100] flex justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-surface w-[90%] max-w-[600px] max-h-[85vh] rounded-3xl shadow-2xl flex flex-col transform scale-95 transition-transform duration-300">
+      <div class="flex justify-between items-center px-6 py-5 border-b border-surface-container-high">
+        <h2 class="text-2xl font-bold text-primary">Your Wellness Guide</h2>
+        <button class="material-symbols-outlined text-outline hover:text-on-surface transition-colors" onclick="closeModal()">close</button>
       </div>
-      <div id="preview-content" class="modal-body">
-         <!-- Preview HTML injected here -->
+      <div id="summary-body" class="p-6 overflow-y-auto flex-1 font-body-md text-on-surface">
+        <!-- AI generated HTML goes here -->
       </div>
-    </div>
-  </div>
-
-  <!-- Form Image Preview Modal -->
-  <div id="form-image-modal" class="modal hidden">
-    <div class="modal-content form-image-modal-content">
-      <div class="modal-header">
-        <h2>Aadhaar Form Preview</h2>
-        <button id="close-form-image-modal" class="icon-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="modal-body form-image-body">
-        <img src="preview.jpeg" alt="Aadhaar Enrollment Form Preview" class="form-preview-img">
+      <div class="p-4 bg-surface-container-low rounded-b-3xl text-center">
+        <p class="text-xs text-outline italic">This assistant provides emotional wellness support and is not a medical diagnosis tool. If you are in immediate danger, please use the Crisis Hotline.</p>
       </div>
     </div>
   </div>

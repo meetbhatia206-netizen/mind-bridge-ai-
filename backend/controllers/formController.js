@@ -178,7 +178,7 @@ const generateQr = (req, res) => {
   });
 };
 
-const getSmartSummary = (req, res) => {
+const getSmartSummary = async (req, res) => {
   const { sessionId, lang } = req.query;
   if (!sessionId) return res.status(400).json({ error: 'Missing sessionId' });
   
@@ -188,9 +188,13 @@ const getSmartSummary = (req, res) => {
   const form = forms[session.formId];
   if (!form) return res.status(404).json({ error: 'Form layout not found' });
   
-  const htmlSummary = summaryGenerator.generateSummary(session.formId, session.answers, lang || 'en');
-  
-  res.send({ html: htmlSummary });
+  try {
+    const htmlSummary = await summaryGenerator.generateSummary(session.formId, session.answers, lang || 'en');
+    res.send({ html: htmlSummary });
+  } catch (err) {
+    console.error("Gemini API Error:", err);
+    res.status(500).json({ error: 'Failed to generate guide.' });
+  }
 };
 
 module.exports = {

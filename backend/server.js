@@ -32,5 +32,5 @@ app.get('/health', (req, res) => {
 // Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`SmartGuide Backend running on http://localhost:${PORT}`);
+  console.log(`MindBridge AI Backend running on http://localhost:${PORT}`);
 });
