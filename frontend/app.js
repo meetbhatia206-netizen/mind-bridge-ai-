@@ -7,6 +7,7 @@ const API_BASE = 'http://localhost:3000/api';
 // Globals
 let currentSessionId = null;
 let currentQuestion = null;
+let currentLang = 'en'; // Defaults to English
 
 // DOM Elements
 const chatWidget = document.getElementById('chat-widget');
@@ -17,53 +18,80 @@ const modalSummary = document.getElementById('modal-summary');
 const summaryBody = document.getElementById('summary-body');
 
 // Empathetic phrases for human-like responses
-const empatheticPhrases = [
-  "You're not alone in feeling this way.",
-  "It's okay to feel overwhelmed.",
-  "I hear you. Let's work through this together.",
-  "Small steps can make a difference.",
-  "Thank you for sharing that with me.",
-  "I understand. Take a deep breath."
-];
+const empatheticPhrases = {
+  en: [
+    "You're not alone in feeling this way.",
+    "It's okay to feel overwhelmed.",
+    "I hear you. Let's work through this together.",
+    "Small steps can make a difference.",
+    "Thank you for sharing that with me.",
+    "I understand. Take a deep breath."
+  ],
+  hi: [
+    "ऐसा महसूस करने वाले आप अकेले नहीं हैं।",
+    "अभिभूत महसूस करना ठीक है।",
+    "मैं आपको सुन रहा हूं। आइए मिलकर इसका समाधान करें।",
+    "छोटे कदम बड़ा बदलाव ला सकते हैं।",
+    "यह मेरे साथ साझा करने के लिए धन्यवाद।",
+    "मैं समझता हूँ। एक गहरी सांस लें।"
+  ]
+};
 
 function getRandomEmpathy() {
-  return empatheticPhrases[Math.floor(Math.random() * empatheticPhrases.length)];
+  const phrases = empatheticPhrases[currentLang] || empatheticPhrases['en'];
+  return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'hi' : 'en';
+  // Update toggle button text if it exists
+  const langBtn = document.getElementById('lang-toggle-btn');
+  if (langBtn) {
+    langBtn.textContent = currentLang === 'en' ? 'EN' : 'HI';
+  }
 }
 
 // Open Chat Widget and start specific flow
 async function openChat(formId) {
+  if (!chatWidget) return;
   chatWidget.classList.add('active');
-  chatArea.innerHTML = '';
+  if (chatArea) chatArea.innerHTML = '';
   currentSessionId = null;
   currentQuestion = null;
   
-  chatInput.disabled = true;
-  btnSend.disabled = true;
+  if (chatInput) chatInput.disabled = true;
+  if (btnSend) btnSend.disabled = true;
   
-  appendMessage('bot', 'Connecting to your AI Wellness Mentor...', true);
+  appendMessage('bot', currentLang === 'hi' ? 'आपके AI वेलनेस मेंटर से कनेक्ट हो रहा है...' : 'Connecting to your AI Wellness Mentor...', true);
 
   try {
     const res = await fetch(`${API_BASE}/start-session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ formId: formId, lang: 'en' })
+      body: JSON.stringify({ formId: formId, lang: currentLang })
     });
+    
+    if (!res.ok) throw new Error('Failed to start session');
+    
     const data = await res.json();
-    currentSessionId = data.sessionId;
+    currentSessionId = data.sessionId || null;
     
-    // Clear connecting message
-    chatArea.innerHTML = '';
+    if (chatArea) chatArea.innerHTML = '';
     
-    appendMessage('bot', "Hi there. I'm your AI Wellness Mentor. I'm here to listen and support you. Take your time.");
+    const welcomeMsg = currentLang === 'hi' 
+      ? "नमस्ते। मैं आपका AI वेलनेस मेंटर हूं। मैं यहां आपकी बात सुनने और आपका समर्थन करने के लिए हूं। अपना समय लें।" 
+      : "Hi there. I'm your AI Wellness Mentor. I'm here to listen and support you. Take your time.";
+      
+    appendMessage('bot', welcomeMsg);
     
     fetchNextQuestion();
   } catch (err) {
-    appendMessage('bot', 'Sorry, I am having trouble connecting right now.');
+    appendMessage('bot', currentLang === 'hi' ? 'क्षमा करें, अभी कनेक्ट होने में समस्या आ रही है।' : 'Sorry, I am having trouble connecting right now.');
   }
 }
 
 function closeChat() {
-  chatWidget.classList.remove('active');
+  if (chatWidget) chatWidget.classList.remove('active');
 }
 
 // Fetch next question from backend
@@ -72,48 +100,68 @@ async function fetchNextQuestion() {
 
   try {
     const res = await fetch(`${API_BASE}/next-question?sessionId=${currentSessionId}`);
+    if (!res.ok) throw new Error('Failed to fetch question');
+    
     const data = await res.json();
 
     if (data.status === 'completed') {
-      appendMessage('bot', "Thank you for sharing all of that with me. Please give me a moment while I generate a personalized wellness guide for you...", true);
+      const waitMsg = currentLang === 'hi'
+        ? "यह सब मेरे साथ साझा करने के लिए धन्यवाद। कृपया मुझे कुछ समय दें जब तक मैं आपके लिए एक व्यक्तिगत वेलनेस गाइड तैयार करूँ..."
+        : "Thank you for sharing all of that with me. Please give me a moment while I generate a personalized wellness guide for you...";
+      appendMessage('bot', waitMsg, true);
       generateWellnessGuide();
       return;
     }
 
     currentQuestion = data.question;
+    
+    if (!currentQuestion) {
+      throw new Error('Question data is missing');
+    }
+
+    // Determine the correct label based on language fallback
+    let questionText = currentQuestion[`label_${currentLang}`] || currentQuestion.label_en || currentQuestion.label || "I'm here to support you.";
 
     // Check if we need to explain a complex term first
-    if (currentQuestion.explanation_term && currentQuestion.explanation_en) {
-      appendMessage('bot', `Before we continue, let's talk about **${currentQuestion.explanation_term}**.<br><br>${currentQuestion.explanation_en}`);
-      // Wait a moment for them to read it
+    const explanationTerm = currentQuestion.explanation_term;
+    const explanationText = currentQuestion[`explanation_${currentLang}`] || currentQuestion.explanation_en;
+
+    if (explanationTerm && explanationText) {
+      const prefix = currentLang === 'hi' ? "आगे बढ़ने से पहले, आइए बात करते हैं" : "Before we continue, let's talk about";
+      appendMessage('bot', `${prefix} **${explanationTerm}**.<br><br>${explanationText}`);
+      
+      // Wait a moment for them to read it before showing the actual question
       setTimeout(() => {
-        appendMessage('bot', currentQuestion.label);
+        appendMessage('bot', questionText);
         enableInput();
       }, 1500);
     } else {
-      appendMessage('bot', currentQuestion.label);
+      appendMessage('bot', questionText);
       enableInput();
     }
     
   } catch (err) {
-    appendMessage('bot', 'Network error. Please try again.');
+    const errorMsg = currentLang === 'hi' ? 'नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।' : 'Network error. Please try again.';
+    appendMessage('bot', errorMsg);
+    enableInput();
   }
 }
 
 // Handle User Input Submit
 async function submitAnswer() {
+  if (!chatInput) return;
   const text = chatInput.value.trim();
   if (!text || !currentSessionId || !currentQuestion) return;
 
   chatInput.value = '';
   chatInput.disabled = true;
-  btnSend.disabled = true;
+  if (btnSend) btnSend.disabled = true;
 
   appendMessage('user', text);
 
   // Validate answer locally before sending
-  if (currentQuestion.type === 'number' && !/^\d+$/.test(text)) {
-    appendMessage('bot', 'Please enter a number.');
+  if (currentQuestion.type === 'number' && !/^\\d+$/.test(text)) {
+    appendMessage('bot', currentLang === 'hi' ? 'कृपया एक संख्या दर्ज करें।' : 'Please enter a number.');
     enableInput();
     return;
   }
@@ -129,15 +177,16 @@ async function submitAnswer() {
       })
     });
     
+    if (!res.ok) throw new Error('Failed to save answer');
     const data = await res.json();
     
     if (data.error) {
-      appendMessage('bot', data.error);
+      appendMessage('bot', data.error || 'An error occurred.');
       enableInput();
       return;
     }
 
-    // Add empathetic response before the next question
+    // Add empathetic response before the next question sometimes
     if (Math.random() > 0.3) {
       appendMessage('bot', getRandomEmpathy());
       setTimeout(() => fetchNextQuestion(), 1000);
@@ -146,7 +195,7 @@ async function submitAnswer() {
     }
     
   } catch (err) {
-    appendMessage('bot', 'Failed to save answer. Try again.');
+    appendMessage('bot', currentLang === 'hi' ? 'उत्तर सहेजने में विफल। पुनः प्रयास करें।' : 'Failed to save answer. Try again.');
     enableInput();
   }
 }
@@ -154,24 +203,29 @@ async function submitAnswer() {
 // Generate the final Gemini guide
 async function generateWellnessGuide() {
   try {
-    const res = await fetch(`${API_BASE}/smart-summary?sessionId=${currentSessionId}&lang=en`);
+    const res = await fetch(`${API_BASE}/smart-summary?sessionId=${currentSessionId}&lang=${currentLang}`);
+    if (!res.ok) throw new Error('Failed to generate summary');
     const data = await res.json();
     
-    summaryBody.innerHTML = data.html;
-    chatWidget.classList.remove('active');
-    modalSummary.classList.add('active');
+    if (summaryBody) {
+      summaryBody.innerHTML = data.html || "<p>Guide could not be generated.</p>";
+    }
+    closeChat();
+    if (modalSummary) modalSummary.classList.add('active');
     
   } catch (err) {
-    appendMessage('bot', 'Sorry, I failed to generate your guide.');
+    appendMessage('bot', currentLang === 'hi' ? 'क्षमा करें, मैं आपका गाइड तैयार करने में विफल रहा।' : 'Sorry, I failed to generate your guide.');
+    enableInput(); // Let them try again or something
   }
 }
 
 function closeModal() {
-  modalSummary.classList.remove('active');
+  if (modalSummary) modalSummary.classList.remove('active');
 }
 
 // UI Helpers
 function appendMessage(sender, text, isTyping = false) {
+  if (!chatArea) return;
   const row = document.createElement('div');
   row.className = `msg-row ${sender}`;
   
@@ -189,7 +243,9 @@ function appendMessage(sender, text, isTyping = false) {
     const typingRow = document.getElementById('typing-indicator-row');
     if (typingRow) typingRow.remove();
 
-    row.innerHTML = `<div class="bubble">${text}</div>`;
+    // Prevent undefined text
+    const safeText = text || (currentLang === 'hi' ? 'एक त्रुटि हुई।' : 'An error occurred.');
+    row.innerHTML = `<div class="bubble">${safeText}</div>`;
   }
   
   chatArea.appendChild(row);
@@ -197,13 +253,20 @@ function appendMessage(sender, text, isTyping = false) {
 }
 
 function enableInput() {
-  chatInput.disabled = false;
-  btnSend.disabled = false;
-  chatInput.focus();
+  if (chatInput) {
+    chatInput.disabled = false;
+    chatInput.focus();
+  }
+  if (btnSend) btnSend.disabled = false;
 }
 
 // Event Listeners
-btnSend.addEventListener('click', submitAnswer);
-chatInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') submitAnswer();
-});
+if (btnSend) {
+  btnSend.addEventListener('click', submitAnswer);
+}
+
+if (chatInput) {
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') submitAnswer();
+  });
+}

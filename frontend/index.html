@@ -94,6 +94,7 @@
     </div>
     <h1 class="font-headline-md text-2xl font-bold text-primary">Serenity</h1>
     <div class="flex items-center gap-4">
+      <button id="lang-toggle-btn" class="font-label-lg font-bold text-primary hover:bg-surface-container-low px-3 py-1 rounded-full transition-colors" onclick="toggleLanguage()">EN</button>
       <div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
         <img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLQDLbmgABh6SW8IuFFK5CeQtwo9_9OLCNjSw2SJkVeYGcoKwouqap8qAM8fZ-9NjkItnPwiybl-Fjenu7-8G75Lz1iVdnsuaQ6iXO9O21hRFa4BUIrKIyDlov102pVvP4IHJDRm0OEySAFKrMN_Zq5U_83Hpj7lklA3tmWs8492OJXmH1aECjcGWMequXXrlfKvf1yvj3RiRU2u9JyvVWT9sVBBKEmPx-fAf0kvtbQpnPBHdP-mgfBLS1pYOQFXZoe3OhFCyIre0"/>
       </div>
@@ -126,46 +127,74 @@
     </section>
 
     <!-- Support Options Grid -->
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 items-stretch">
       
-      <!-- General Chatbot Trigger -->
-      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 group cursor-pointer" onclick="openChat('emotional_wellness')">
+      <!-- Emotional Wellness Flow -->
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer h-full" onclick="openChat('emotional_wellness')">
         <div class="bg-primary-container/10 p-4 rounded-lg">
           <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
         </div>
-        <div>
-          <h4 class="text-xl font-semibold text-on-surface mb-2">Talk to AI Counselor</h4>
+        <div class="flex-grow">
+          <h4 class="text-xl font-semibold text-on-surface mb-2">Emotional Wellness</h4>
           <p class="text-base text-on-surface-variant mb-6">Start a private, secure conversation with our AI wellness mentor right now.</p>
         </div>
-        <button class="mt-auto w-full bg-primary text-on-primary font-semibold py-3 rounded-full shadow-lg shadow-primary/20 hover:bg-primary-container transition-colors active:scale-95 duration-150">
+        <button class="w-full bg-primary text-on-primary font-semibold py-3 rounded-full shadow-lg shadow-primary/20 hover:bg-primary-container transition-colors active:scale-95 duration-150 mt-auto">
           Start Messaging
         </button>
       </div>
 
       <!-- Student Burnout Flow -->
-      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer" onclick="openChat('student_burnout')">
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer h-full" onclick="openChat('student_burnout')">
         <div class="bg-tertiary-container/10 p-4 rounded-lg">
           <span class="material-symbols-outlined text-tertiary text-3xl" style="font-variation-settings: 'FILL' 1;">school</span>
         </div>
-        <div>
+        <div class="flex-grow">
           <h4 class="text-xl font-semibold text-on-surface mb-2">Student Burnout</h4>
           <p class="text-base text-on-surface-variant mb-6">Feeling overwhelmed with exams or mental fatigue? Let's work through it.</p>
         </div>
-        <button class="mt-auto w-full bg-surface-container-high text-on-surface-variant font-semibold py-3 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150">
+        <button class="w-full bg-surface-container-high text-on-surface-variant font-semibold py-3 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 mt-auto">
           Get Support
         </button>
       </div>
 
       <!-- Anxiety Support Flow -->
-      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer" onclick="openChat('anxiety_support')">
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer h-full" onclick="openChat('anxiety_support')">
         <div class="bg-[#ffdad6]/40 p-4 rounded-lg">
           <span class="material-symbols-outlined text-[#ba1a1a] text-3xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
         </div>
-        <div>
+        <div class="flex-grow">
           <h4 class="text-xl font-semibold text-on-surface mb-2">Anxiety Support</h4>
           <p class="text-base text-on-surface-variant mb-6">Experiencing overthinking, restlessness, or panic? We can help you calm down.</p>
         </div>
-        <button class="mt-auto w-full bg-surface-container-high text-on-surface-variant font-semibold py-3 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150">
+        <button class="w-full bg-surface-container-high text-on-surface-variant font-semibold py-3 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 mt-auto">
+          Get Support
+        </button>
+      </div>
+
+      <!-- Sleep Problems Flow -->
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer h-full" onclick="openChat('sleep_problems')">
+        <div class="bg-[#e4dfff]/40 p-4 rounded-lg">
+          <span class="material-symbols-outlined text-[#2f2c48] text-3xl" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+        </div>
+        <div class="flex-grow">
+          <h4 class="text-xl font-semibold text-on-surface mb-2">Sleep Problems</h4>
+          <p class="text-base text-on-surface-variant mb-6">Having trouble falling asleep or waking up tired? Let's fix your routine.</p>
+        </div>
+        <button class="w-full bg-surface-container-high text-on-surface-variant font-semibold py-3 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 mt-auto">
+          Get Support
+        </button>
+      </div>
+
+      <!-- Overthinking Flow -->
+      <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_-10px_rgba(46,97,148,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(46,97,148,0.12)] transition-shadow duration-500 border border-surface-container-high/50 flex flex-col items-start gap-4 cursor-pointer h-full" onclick="openChat('overthinking')">
+        <div class="bg-secondary-container/40 p-4 rounded-lg">
+          <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">psychology</span>
+        </div>
+        <div class="flex-grow">
+          <h4 class="text-xl font-semibold text-on-surface mb-2">Overthinking</h4>
+          <p class="text-base text-on-surface-variant mb-6">Mind racing with endless scenarios? Let's ground your thoughts.</p>
+        </div>
+        <button class="w-full bg-surface-container-high text-on-surface-variant font-semibold py-3 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 mt-auto">
           Get Support
         </button>
       </div>

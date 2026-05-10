@@ -88,6 +88,8 @@ Example styles:
 - Headings: color: #2e6194; margin-top: 1.5rem; margin-bottom: 0.5rem; font-weight: bold; font-size: 1.2rem;
 - Lists: margin-bottom: 8px; padding-left: 20px;
 - Affirmation box: background: rgba(46,97,148,0.1); border: 1px solid rgba(46,97,148,0.2); padding: 20px; border-radius: 12px; margin-top: 20px; text-align: center; font-style: italic; color: #2e6194;
+
+Please write the output in ${isHi ? 'Hindi' : 'English'}.
   `;
 
   try {
